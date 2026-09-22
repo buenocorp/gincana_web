@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gincana do Conhecimento — CSS, JSP e Servlet</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- BARRA SUPERIOR -->
+<header id="topbar" class="hidden">
+  <div class="topbar-inner">
+    <div class="brand">🏆 <span>GINCANA DO CONHECIMENTO</span></div>
+    <div class="scores">
+      <div class="score-pill single">
+        <span class="team-label">PONTUAÇÃO DA TURMA</span>
+        <span class="team-points" id="score-points">0</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-sound" class="icon-btn" title="Som">🔊 Som: ON</button>
+      <button id="btn-teacher" class="icon-btn" title="Modo Professor">⚙️ Modo Professor</button>
+    </div>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- TELA INICIAL -->
+  <section id="screen-start" class="screen active">
+    <div class="hero card">
+      <div class="hero-badge">DESENVOLVIMENTO WEB</div>
+      <h1>🏆 Gincana do Conhecimento</h1>
+      <h2>CSS · JSP · Servlet</h2>
+      <p class="hero-desc">A turma inteira compete junto contra o relógio do conhecimento. Resolvam desafios, acumulem pontos e desvendem a frase secreta escondida nas fases.</p>
+      <div class="form-actions">
+        <button id="btn-goto-rules" class="btn btn-primary btn-lg">Ver Regras →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGRAS -->
+  <section id="screen-rules" class="screen">
+    <div class="card rules-card">
+      <h2>📜 Regras da Gincana</h2>
+      <p class="rules-intro">6 fases, uma pontuação coletiva. Todas as perguntas têm alternativas — cliquem na resposta certa e ajudem a turma a somar pontos!</p>
+      <div class="rules-grid">
+        <div class="rule-item"><span class="rule-phase">Fase 1</span><span class="rule-name">CSS</span><span class="rule-pts">100 pts</span></div>
+        <div class="rule-item"><span class="rule-phase">Fase 2</span><span class="rule-name">CSS Puzzle</span><span class="rule-pts">150 pts</span></div>
+        <div class="rule-item"><span class="rule-phase">Fase 3</span><span class="rule-name">JSP</span><span class="rule-pts">150 pts</span></div>
+        <div class="rule-item"><span class="rule-phase">Fase 4</span><span class="rule-name">Servlet</span><span class="rule-pts">200 pts</span></div>
+        <div class="rule-item"><span class="rule-phase">Fase 5</span><span class="rule-name">Integração JSP+Servlet</span><span class="rule-pts">250 pts</span></div>
+        <div class="rule-item highlight"><span class="rule-phase">Fase 6</span><span class="rule-name">🔐 Hack the System</span><span class="rule-pts">300 pts</span></div>
+      </div>
+      <ul class="rules-list">
+        <li>Resposta certa soma os pontos da fase para a pontuação única da turma. Resposta errada <strong>desconta 10 pontos</strong>.</li>
+        <li>Depois de cada resposta, uma explicação rápida ajuda a fixar o conteúdo.</li>
+        <li>Ao concluir cada fase, uma <strong>palavra secreta</strong> é revelada 🧩.</li>
+        <li>No final das 6 fases, a turma monta as palavras reveladas em uma frase e precisa <strong>criar uma página HTML simples</strong> que exiba essa frase — o Desafio Final de verdade!</li>
+      </ul>
+      <div class="form-actions">
+        <button id="btn-goto-game" class="btn btn-primary btn-lg">Iniciar Fase 1 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOGO -->
+  <section id="screen-game" class="screen">
+
+    <!-- Progresso de fases -->
+    <div class="phase-track" id="phase-track"></div>
+
+    <!-- Frase secreta -->
+    <div class="phrase-track" id="phrase-track">
+      <span class="phrase-track-label">🧩 Frase secreta:</span>
+      <div class="phrase-chips" id="phrase-chips"></div>
+    </div>
+
+    <!-- Introdução de fase -->
+    <div id="phase-intro" class="phase-intro hidden">
+      <div class="card phase-intro-card">
+        <div class="phase-intro-tag" id="phase-intro-tag">FASE 1</div>
+        <h2 id="phase-intro-title">CSS</h2>
+        <p id="phase-intro-desc">Perguntas sobre seletores, propriedades e Flexbox.</p>
+        <div class="phase-intro-pts" id="phase-intro-pts">100 pontos por acerto</div>
+        <button id="btn-start-phase" class="btn btn-primary btn-lg">Começar Fase →</button>
+      </div>
+    </div>
+
+    <!-- Card de pergunta -->
+    <div id="question-area" class="question-area hidden">
+      <div class="qcounter">
+        <span id="qcounter-text">QUESTÃO 1 / 10</span>
+        <div class="progress-bar"><div class="progress-fill" id="question-progress"></div></div>
+      </div>
+
+      <div class="card question-card">
+        <div class="question-tag" id="question-phase-tag">DESAFIO CSS</div>
+        <p class="question-text" id="question-text"></p>
+        <pre class="question-code hidden" id="question-code"><code></code></pre>
+        <div class="alternatives" id="alternatives"></div>
+      </div>
+    </div>
+
+    <!-- Transição de fase concluída -->
+    <div id="phase-complete" class="phase-intro hidden">
+      <div class="card phase-intro-card">
+        <div class="phase-intro-tag">FASE CONCLUÍDA ✅</div>
+        <h2 id="phase-complete-title">CSS</h2>
+        <div class="word-reveal" id="word-reveal">
+          <span class="word-reveal-label">Palavra revelada:</span>
+          <span class="word-reveal-word" id="word-reveal-word">Quem</span>
+        </div>
+        <p>Pontuação atualizada! Preparem-se para a próxima fase.</p>
+        <button id="btn-next-phase" class="btn btn-primary btn-lg">Próxima Fase →</button>
+      </div>
+    </div>
+
+    <!-- Fase não atingiu o mínimo de acertos -->
+    <div id="phase-failed" class="phase-intro hidden">
+      <div class="card phase-intro-card failed">
+        <div class="phase-intro-tag failed">FASE NÃO CONCLUÍDA ❌</div>
+        <h2 id="phase-failed-title">CSS</h2>
+        <p id="phase-failed-desc">A turma acertou X% desta fase. É preciso pelo menos 70% para avançar.</p>
+        <p>Vamos reforçar o conteúdo — a gincana recomeça da Fase 1!</p>
+        <button id="btn-restart-phase1" class="btn btn-danger btn-lg">🔁 Recomeçar da Fase 1</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUEBRA-CABEÇA FINAL -->
+  <section id="screen-puzzle" class="screen">
+    <div class="puzzle-wrap">
+      <div class="section-header">
+        <h2>🧩 Desafio Final: Montem a Página HTML</h2>
+        <p>Cada fase revelou uma palavra, mas fora de ordem! Descubram a sequência correta e escrevam um HTML simples que exiba a frase completa na tela.</p>
+      </div>
+
+      <div class="secret-phrase">
+        <div class="secret-phrase-label">Palavras reveladas (embaralhadas):</div>
+        <div class="secret-phrase-words" id="puzzle-phrase"></div>
+      </div>
+
+      <div class="puzzle-editor-grid">
+        <div class="puzzle-pane">
+          <div class="puzzle-pane-title">✏️ Código HTML</div>
+          <textarea id="puzzle-code" class="puzzle-textarea" spellcheck="false"></textarea>
+        </div>
+        <div class="puzzle-pane">
+          <div class="puzzle-pane-title">👁️ Visualização ao vivo</div>
+          <iframe id="puzzle-preview" class="puzzle-preview" title="Visualização"></iframe>
+        </div>
+      </div>
+
+      <div id="puzzle-feedback" class="puzzle-feedback hidden"></div>
+
+      <div class="form-actions puzzle-actions">
+        <button id="btn-check-puzzle" class="btn btn-primary btn-lg">✅ Verificar Frase</button>
+        <button id="btn-puzzle-continue" class="btn btn-secondary hidden">Ver Resultado Final →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="screen-result" class="screen">
+    <div class="card result-card">
+      <h1>🏆 FIM DA GINCANA!</h1>
+      <div class="result-sub">PONTUAÇÃO FINAL DA TURMA</div>
+      <div id="result-ranking" class="result-ranking"></div>
+      <div class="form-actions">
+        <button id="btn-restart" class="btn btn-secondary">🔄 Jogar Novamente</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedback-modal" class="modal-overlay hidden">
+  <div class="card feedback-card">
+    <div id="feedback-icon" class="feedback-icon">🎉</div>
+    <div id="feedback-title" class="feedback-title">CORRETO!</div>
+    <div id="feedback-points" class="feedback-points">+100 pontos</div>
+    <div id="feedback-correct-answer" class="feedback-correct-answer hidden"></div>
+    <div class="explanation-box">
+      <div class="explanation-title">💡 EXPLICAÇÃO</div>
+      <div id="feedback-explanation" class="explanation-text"></div>
+    </div>
+    <button id="btn-continue" class="btn btn-primary btn-lg">CONTINUAR</button>
+  </div>
+</div>
+
+<!-- MODO PROFESSOR -->
+<div id="teacher-panel" class="modal-overlay hidden">
+  <div class="card teacher-card">
+    <div class="teacher-header">
+      <h2>⚙️ Modo Professor</h2>
+      <button id="btn-close-teacher" class="icon-btn">✕</button>
+    </div>
+    <div class="teacher-grid single">
+      <div class="teacher-stat">
+        <span class="teacher-stat-label">Turma</span>
+        <span class="teacher-stat-value" id="teacher-score">0 pts</span>
+        <span class="teacher-stat-sub" id="teacher-ac">0 acertos / 0 erros</span>
+      </div>
+    </div>
+    <div class="teacher-info">
+      <div>Fase atual: <strong id="teacher-phase">—</strong></div>
+      <div>Questões respondidas: <strong id="teacher-answered">0</strong></div>
+    </div>
+    <div class="teacher-actions">
+      <button id="btn-teacher-advance" class="btn btn-secondary">⏭️ Avançar manualmente</button>
+      <button id="btn-teacher-reset-score" class="btn btn-secondary">🧹 Zerar pontuação</button>
+      <button id="btn-teacher-restart" class="btn btn-danger">♻️ Reiniciar jogo</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
